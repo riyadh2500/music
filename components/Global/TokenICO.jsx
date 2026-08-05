@@ -53,7 +53,9 @@ const TokenICO = ({ onClose, user }) => {
     }
   };
 
-  useEffect(() => { fetchBalance(); }, [user?.id]);
+  useEffect(() => {
+    // Don't auto-fetch on mount to avoid errors - user can click refresh
+  }, []);
 
   // ── Option A: Pay via MetaMask (if installed) ──────────
   const payWithMetaMask = async () => {
