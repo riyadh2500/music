@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-import { FiMessageCircle, FiShare2 } from "react-icons/fi";
+import { FiMessageCircle, FiShare2, FiDownload } from "react-icons/fi";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import toast from "react-hot-toast";
 
@@ -90,6 +90,39 @@ const Post = ({ post, user }) => {
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
     toast.success("Link copied!");
+  };
+
+  const handleDownload = async () => {
+    if (!user) { toast.error("Sign in to download tracks"); return; }
+    if (!audioUrl) { toast.error("No audio file available"); return; }
+    
+    const loadingToast = toast.loading("Processing download...");
+    try {
+      const res = await fetch("/api/downloads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId: post.id, userId: user.id }),
+      });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        if (data.insufficientTokens) {
+          toast.error(`You need ${data.required} MUSIC tokens. You have ${data.balance}. Buy more tokens!`, { id: loadingToast });
+          return;
+        }
+        throw new Error(data.error || "Download failed");
+      }
+
+      // Download the file
+      const link = document.createElement("a");
+      link.href = data.downloadUrl;
+      link.download = `${post.title || "track"}.mp3`;
+      link.click();
+
+      toast.success(`Downloaded! -10 MUSIC (Balance: ${data.newBalance})`, { id: loadingToast });
+    } catch (err) {
+      toast.error(err.message, { id: loadingToast });
+    }
   };
 
   const genre      = post?.genre || "Electronic";
@@ -217,6 +250,13 @@ const Post = ({ post, user }) => {
           <button onClick={() => toast("Comments coming soon! 💬")}
             style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#737373", padding: 0 }}>
             <FiMessageCircle size={15} /> {initialComments}
+          </button>
+          <button onClick={handleDownload}
+            style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#737373", padding: 0 }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#10b981")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#737373")}
+            title="Download (10 MUSIC)">
+            <FiDownload size={15} /> Download
           </button>
           <button onClick={handleShare}
             style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#737373", padding: 0, marginLeft: "auto" }}
