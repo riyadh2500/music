@@ -101,7 +101,17 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
           nftPrice:      form.price ? parseFloat(form.price) : null,
         }),
       });
-      const postData = await postRes.json();
+      
+      let postData;
+      const contentType = postRes.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        postData = await postRes.json();
+      } else {
+        const text = await postRes.text();
+        console.error("Non-JSON response:", text);
+        throw new Error("Server error - please try again");
+      }
+      
       if (!postRes.ok) {
         if (postData.insufficientTokens) {
           throw new Error(`Not enough MUSIC tokens. You need 10 MUSIC to upload. You have ${postData.balance}. Buy more tokens to continue.`);
@@ -110,7 +120,7 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
       }
 
       toast.success(`Track published! 🎉 (-10 MUSIC — balance: ${postData.newTokenBalance} MUSIC)`);
-      router.push("/");    } catch (err) {
+      window.location.href = "/";    } catch (err) {
       toast.error(err.message);
     } finally {
       setUploading(false);
