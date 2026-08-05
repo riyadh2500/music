@@ -36,11 +36,21 @@ const TokenICO = ({ onClose, user }) => {
     if (!user?.id) return;
     setBalanceLoading(true);
     try {
-      const res  = await fetch(`/api/wallet/balance?userId=${user.id}`);
-      const data = await res.json();
-      setMusicBalance(data.musicTokens ?? 0);
-    } catch { setMusicBalance(0); }
-    finally { setBalanceLoading(false); }
+      const res = await fetch(`/api/wallet/balance?userId=${user.id}`);
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await res.json();
+        setMusicBalance(data.musicTokens ?? 0);
+      } else {
+        console.error("Non-JSON response from balance API");
+        setMusicBalance(0);
+      }
+    } catch (err) {
+      console.error("Balance fetch error:", err);
+      setMusicBalance(0);
+    } finally {
+      setBalanceLoading(false);
+    }
   };
 
   useEffect(() => { fetchBalance(); }, [user?.id]);
