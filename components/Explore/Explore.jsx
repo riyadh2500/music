@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ExploreCard from "./ExploreCard";
 
-const GENRES = ["All", "Electronic", "Hip-Hop", "Pop", "Jazz", "Rock", "Ambient"];
+const GENRES = ["All", "Electronic", "Hindi", "Artistic", "Pop", "Japanese", "Other"];
 
 const Explore = ({ user }) => {
   const [activeGenre, setActiveGenre] = useState("All");

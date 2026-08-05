@@ -229,19 +229,35 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
           {/* Step 1: Details */}
           {step === 1 && (
             <div style={{ background: "#fff", border: "1px solid #e5e5e5", borderRadius: 16, padding: 28 }}>
-              {[
-                { label: "Track Title *", name: "title",       placeholder: "My Amazing Track" },
-                { label: "Artist Name",   name: "artist",      placeholder: "Your name or alias" },
-                { label: "Genre",         name: "genre",        placeholder: "Electronic, Hip-Hop, Pop…" },
-              ].map((field) => (
-                <div key={field.name} style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 13, fontWeight: 500, color: "#525252", display: "block", marginBottom: 6 }}>{field.label}</label>
-                  <input type="text" name={field.name} value={form[field.name]} onChange={handleChange} placeholder={field.placeholder}
-                    style={inputStyle}
-                    onFocus={(e) => (e.target.style.borderColor = "#10b981")}
-                    onBlur={(e)  => (e.target.style.borderColor = "#e5e5e5")} />
-                </div>
-              ))}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "#525252", display: "block", marginBottom: 6 }}>Track Title *</label>
+                <input type="text" name="title" value={form.title} onChange={handleChange} placeholder="My Amazing Track"
+                  style={inputStyle}
+                  onFocus={(e) => (e.target.style.borderColor = "#10b981")}
+                  onBlur={(e)  => (e.target.style.borderColor = "#e5e5e5")} />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "#525252", display: "block", marginBottom: 6 }}>Artist Name</label>
+                <input type="text" name="artist" value={form.artist} onChange={handleChange} placeholder="Your name or alias"
+                  style={inputStyle}
+                  onFocus={(e) => (e.target.style.borderColor = "#10b981")}
+                  onBlur={(e)  => (e.target.style.borderColor = "#e5e5e5")} />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "#525252", display: "block", marginBottom: 6 }}>Genre</label>
+                <select name="genre" value={form.genre} onChange={handleChange}
+                  style={{ ...inputStyle, cursor: "pointer" }}
+                  onFocus={(e) => (e.target.style.borderColor = "#10b981")}
+                  onBlur={(e)  => (e.target.style.borderColor = "#e5e5e5")}>
+                  <option value="">Select genre...</option>
+                  <option value="Electronic">Electronic</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="Artistic">Artistic</option>
+                  <option value="Pop">Pop</option>
+                  <option value="Japanese">Japanese</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
               <div style={{ marginBottom: 20 }}>
                 <label style={{ fontSize: 13, fontWeight: 500, color: "#525252", display: "block", marginBottom: 6 }}>Description</label>
                 <textarea name="description" value={form.description} onChange={handleChange} placeholder="Describe your track…" rows={3}
