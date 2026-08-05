@@ -172,14 +172,26 @@ const Post = ({ post, user }) => {
       {/* Info */}
       <div style={{ padding: "14px 16px" }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: "50%",
-            background: "linear-gradient(135deg,#10b981,#059669)",
-            flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontWeight: 700, fontSize: 14,
-          }}>
-            {artistName[0]?.toUpperCase()}
-          </div>
+          {/* Profile avatar - show image if available */}
+          {post?.profile?.avatar_url ? (
+            <img
+              src={post.profile.avatar_url}
+              alt={artistName}
+              style={{
+                width: 36, height: 36, borderRadius: "50%",
+                flexShrink: 0, objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div style={{
+              width: 36, height: 36, borderRadius: "50%",
+              background: "linear-gradient(135deg,#10b981,#059669)",
+              flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontWeight: 700, fontSize: 14,
+            }}>
+              {artistName[0]?.toUpperCase()}
+            </div>
+          )}
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 600, fontSize: 15, color: "#171717" }}>{post?.title}</div>
             <div style={{ fontSize: 13, color: "#737373", marginTop: 2 }}>{artistName}</div>
