@@ -1,17 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import toast from "react-hot-toast";
+import { AudioPlayerContext } from "../../Context/AudioPlayerContext";
 
-const ExploreCard = ({ item }) => {
+const ExploreCard = ({ item, user }) => {
   const [liked, setLiked] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(AudioPlayerContext) || {};
+
+  const isCurrentTrack = currentTrack?.id === item.id;
+  const isThisPlaying = isCurrentTrack && isPlaying;
 
   const handlePlay = (e) => {
     e.stopPropagation();
-    const next = !playing;
-    setPlaying(next);
-    toast(next ? `Now playing: ${item.title}` : "Paused", { icon: next ? "▶️" : "⏸" });
+    if (isCurrentTrack) {
+      isPlaying ? pauseTrack?.() : playTrack?.(item);
+    } else {
+      playTrack?.(item);
+    }
   };
 
   const handleLike = (e) => {
@@ -19,6 +25,11 @@ const ExploreCard = ({ item }) => {
     setLiked((l) => !l);
     toast(liked ? "Removed from liked songs" : "Added to liked songs ❤️");
   };
+
+  // Determine cover image or gradient
+  const coverStyle = item.coverUrl
+    ? { backgroundImage: `url(${item.coverUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+    : { background: item.coverGradient || "linear-gradient(135deg,#1e3a5f,#0f2027)" };
 
   return (
     <div
@@ -42,7 +53,7 @@ const ExploreCard = ({ item }) => {
       <div
         style={{
           height: 140,
-          background: item.gradient,
+          ...coverStyle,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -55,7 +66,7 @@ const ExploreCard = ({ item }) => {
             width: 44,
             height: 44,
             borderRadius: "50%",
-            background: playing ? "rgba(16,185,129,0.9)" : "rgba(255,255,255,0.2)",
+            background: isThisPlaying ? "rgba(16,185,129,0.9)" : "rgba(255,255,255,0.2)",
             border: "2px solid rgba(255,255,255,0.5)",
             display: "flex",
             alignItems: "center",
@@ -63,7 +74,7 @@ const ExploreCard = ({ item }) => {
             transition: "background 0.2s",
           }}
         >
-          {playing ? <BsPauseFill size={20} color="#fff" /> : <BsPlayFill size={20} color="#fff" />}
+          {isThisPlaying ? <BsPauseFill size={20} color="#fff" /> : <BsPlayFill size={20} color="#fff" />}
         </div>
 
         <button
@@ -89,7 +100,7 @@ const ExploreCard = ({ item }) => {
           {liked ? <AiFillHeart size={14} color="#ef4444" /> : <AiOutlineHeart size={14} color="#fff" />}
         </button>
 
-        {playing && (
+        {isThisPlaying && (
           <span style={{ position: "absolute", bottom: 6, left: 10, fontSize: 10, color: "#10b981", fontWeight: 700 }}>
             ● PLAYING
           </span>
@@ -97,20 +108,24 @@ const ExploreCard = ({ item }) => {
       </div>
 
       <div style={{ padding: "12px 14px" }}>
-        <div style={{ fontWeight: 600, fontSize: 14, color: "#171717" }}>{item.title}</div>
-        <div style={{ fontSize: 12, color: "#737373", marginTop: 3 }}>{item.artist}</div>
+        <div style={{ fontWeight: 600, fontSize: 14, color: "#171717", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {item.title}
+        </div>
+        <div style={{ fontSize: 12, color: "#737373", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {item.artist || item.profile?.username || "Unknown Artist"}
+        </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 11, color: "#a3a3a3" }}>
-          <span>{item.plays} plays</span>
+          <span>{item.plays || 0} plays</span>
           <span
             style={{
-              background: item.tagColor || "#f0fdf4",
-              color: item.tagTextColor || "#059669",
+              background: "#f0fdf4",
+              color: "#059669",
               padding: "2px 8px",
               borderRadius: 20,
               fontWeight: 500,
             }}
           >
-            {item.genre}
+            {item.genre || "Electronic"}
           </span>
         </div>
       </div>
