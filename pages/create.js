@@ -68,12 +68,12 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
       toast("Uploading audio...", { icon: "🎵" });
       const audioFileName = `${userId}_${Date.now()}_${audioFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
       const { data: audioData, error: audioErr } = await supabase.storage
-        .from("audio")
+        .from("music")
         .upload(audioFileName, audioFile, { contentType: audioFile.type });
 
       if (audioErr) throw new Error(audioErr.message || "Audio upload failed");
       
-      const audioUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio/${audioData.path}`;
+      const audioUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/music/${audioData.path}`;
       toast.success("Audio uploaded!");
 
       // 2. Upload cover (optional)
