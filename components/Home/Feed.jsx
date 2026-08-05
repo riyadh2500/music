@@ -35,7 +35,12 @@ const Feed = ({ user }) => {
   }
 
   return (
-    <div>
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(2, 1fr)",
+      gap: "20px",
+      marginTop: "20px",
+    }}>
       {posts.map((post) => (
         <Post key={post.id} post={post} user={user} />
       ))}
