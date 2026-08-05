@@ -50,16 +50,31 @@ const ArtistCard = ({ artist, index, user }) => {
     >
       <div style={{ height: 70, background: gradient }} />
       <div style={{ padding: "0 16px 16px", marginTop: -28 }}>
-        <div
-          style={{
-            width: 56, height: 56, borderRadius: "50%",
-            background: gradient, border: "3px solid #fff",
-            margin: "0 auto 10px", display: "flex", alignItems: "center",
-            justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 20,
-          }}
-        >
-          {artist.username?.[0]?.toUpperCase()}
-        </div>
+        {/* Avatar - show image if available, otherwise show initial */}
+        {artist.avatar_url ? (
+          <img
+            src={artist.avatar_url}
+            alt={artist.username}
+            style={{
+              width: 56, height: 56, borderRadius: "50%",
+              border: "3px solid #fff",
+              margin: "0 auto 10px",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 56, height: 56, borderRadius: "50%",
+              background: gradient, border: "3px solid #fff",
+              margin: "0 auto 10px", display: "flex", alignItems: "center",
+              justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 20,
+            }}
+          >
+            {artist.username?.[0]?.toUpperCase()}
+          </div>
+        )}
         <div style={{ fontWeight: 600, fontSize: 15, color: "#171717", marginBottom: 4 }}>{artist.username}</div>
         <div style={{ fontSize: 12, color: "#737373", marginBottom: 14 }}>{artist.bio || "Music Creator"}</div>
         <button
