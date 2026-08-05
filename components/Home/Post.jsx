@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FiMessageCircle, FiShare2, FiDownload } from "react-icons/fi";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import toast from "react-hot-toast";
+import { AudioPlayerContext } from "../../Context/AudioPlayerContext";
 
 const GENRE_COLORS = {
   Electronic: "#8b5cf6", "Hip-Hop": "#f59e0b",
@@ -10,64 +11,25 @@ const GENRE_COLORS = {
 };
 
 const Post = ({ post, user }) => {
+  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(AudioPlayerContext);
   const initialLikes    = post?.likes?.[0]?.count ?? 0;
   const initialComments = post?.comments?.[0]?.count ?? 0;
 
-  const [liked, setLiked]     = useState(false);
-  const [likes, setLikes]     = useState(initialLikes);
-  const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef(null);
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(initialLikes);
 
   const audioUrl = post?.audio_url || post?.audioUrl;
-
-  // Sync play/pause with audio element
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !audioUrl) return;
-    if (playing) {
-      audio.play().catch(() => {
-        toast.error("Could not play audio.");
-        setPlaying(false);
-      });
-    } else {
-      audio.pause();
-    }
-  }, [playing, audioUrl]);
+  const isCurrentTrack = currentTrack?.id === post?.id;
+  const isThisPlaying = isCurrentTrack && isPlaying;
 
   const handlePlay = () => {
     if (!audioUrl) { toast.error("No audio file for this track."); return; }
-    setPlaying((p) => !p);
-  };
-
-  const handleTimeUpdate = () => {
-    const audio = audioRef.current;
-    if (audio && audio.duration) {
-      setProgress((audio.currentTime / audio.duration) * 100);
+    
+    if (isCurrentTrack) {
+      isPlaying ? pauseTrack() : playTrack(post);
+    } else {
+      playTrack({ ...post, audioUrl });
     }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) setDuration(audioRef.current.duration);
-  };
-
-  const handleEnded = () => setPlaying(false);
-
-  const handleSeek = (e) => {
-    const audio = audioRef.current;
-    if (!audio || !audio.duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct  = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-    setProgress(pct * 100);
-  };
-
-  const formatTime = (secs) => {
-    if (!secs || isNaN(secs)) return "0:00";
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
   };
 
   const handleLike = async () => {
@@ -128,9 +90,6 @@ const Post = ({ post, user }) => {
   const genre      = post?.genre || "Electronic";
   const genreColor = GENRE_COLORS[genre] || "#10b981";
   const artistName = post?.profile?.username || post?.artist || "Unknown Artist";
-  const trackDuration = duration
-    ? formatTime(duration)
-    : (post?.duration || "—");
 
   return (
     <div
@@ -142,18 +101,6 @@ const Post = ({ post, user }) => {
       onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.07)")}
       onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
     >
-      {/* Hidden audio element */}
-      {audioUrl && (
-        <audio
-          ref={audioRef}
-          src={audioUrl}
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onEnded={handleEnded}
-          preload="metadata"
-        />
-      )}
-
       {/* Cover */}
       <div
         onClick={handlePlay}
@@ -167,40 +114,25 @@ const Post = ({ post, user }) => {
       >
         <button style={{
           width: 52, height: 52, borderRadius: "50%",
-          background: playing ? "rgba(16,185,129,0.9)" : "rgba(255,255,255,0.2)",
+          background: isThisPlaying ? "rgba(16,185,129,0.9)" : "rgba(255,255,255,0.2)",
           border: "2px solid rgba(255,255,255,0.6)",
           cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
           backdropFilter: "blur(8px)", transition: "background 0.2s",
         }}>
-          {playing ? <BsPauseFill size={22} color="#fff" /> : <BsPlayFill size={22} color="#fff" />}
+          {isThisPlaying ? <BsPauseFill size={22} color="#fff" /> : <BsPlayFill size={22} color="#fff" />}
         </button>
         <span style={{ position: "absolute", top: 12, right: 12, background: genreColor, color: "#fff", fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20 }}>
           {genre}
         </span>
         <span style={{ position: "absolute", bottom: 10, left: 14, color: "rgba(255,255,255,0.8)", fontSize: 12 }}>
-          {trackDuration}
+          {post?.duration || "—"}
         </span>
-        {playing && (
+        {isThisPlaying && (
           <span style={{ position: "absolute", bottom: 10, right: 14, color: "#10b981", fontSize: 11, fontWeight: 600 }}>
             ● PLAYING
           </span>
         )}
       </div>
-
-      {/* Progress bar */}
-      {audioUrl && (
-        <div
-          onClick={handleSeek}
-          style={{
-            height: 4, background: "#e5e5e5", cursor: "pointer", position: "relative",
-          }}
-        >
-          <div style={{
-            height: "100%", background: "#10b981",
-            width: `${progress}%`, transition: "width 0.1s",
-          }} />
-        </div>
-      )}
 
       {/* Info */}
       <div style={{ padding: "14px 16px" }}>

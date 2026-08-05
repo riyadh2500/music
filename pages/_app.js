@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { supabase } from "../lib/supabase";
+import { AudioPlayerProvider } from "../Context/AudioPlayerContext";
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }) {
@@ -81,7 +82,7 @@ export default function App({ Component, pageProps }) {
   }, []);
 
   return (
-    <>
+    <AudioPlayerProvider>
       <Component
         {...pageProps}
         user={user}
@@ -96,6 +97,6 @@ export default function App({ Component, pageProps }) {
           success: { iconTheme: { primary: "#10b981", secondary: "#fff" } },
         }}
       />
-    </>
+    </AudioPlayerProvider>
   );
 }

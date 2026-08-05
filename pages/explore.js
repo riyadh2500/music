@@ -17,7 +17,7 @@ const ExplorePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) 
           minHeight: "calc(100vh - 64px - 72px)",
           background: "#fafafa" }}
       >
-        <Explore />
+        <Explore user={user} />
         <Footer />
       </main>
       <Player />
