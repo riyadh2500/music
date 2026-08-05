@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { Header, Sidebar, Player, Footer } from "../components";
 import { FiMusic, FiImage, FiUploadCloud } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { supabase } from "../lib/supabase";
 
 const STEPS = ["Upload Audio", "Add Details", "Set Price", "Publish"];
 
@@ -63,14 +64,17 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
       const userId = user.id;
       if (!userId) { toast.error("Could not resolve user. Please sign in again."); setUploading(false); return; }
 
-      // 1. Upload audio
-      const audioForm = new FormData();
-      audioForm.append("audio", audioFile);
-      audioForm.append("userId", userId);
-      const audioRes  = await fetch("/api/upload/audio", { method: "POST", body: audioForm });
-      const audioData = await audioRes.json();
-      if (!audioRes.ok) throw new Error(audioData.error || "Audio upload failed");
-      const audioUrl = audioData.url;
+      // 1. Upload audio directly to Supabase Storage (bypasses Vercel 4.5MB limit)
+      toast("Uploading audio...", { icon: "🎵" });
+      const audioFileName = `${userId}_${Date.now()}_${audioFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      const { data: audioData, error: audioErr } = await supabase.storage
+        .from("audio")
+        .upload(audioFileName, audioFile, { contentType: audioFile.type });
+
+      if (audioErr) throw new Error(audioErr.message || "Audio upload failed");
+      
+      const audioUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio/${audioData.path}`;
+      toast.success("Audio uploaded!");
 
       // 2. Upload cover (optional)
       let coverUrl = null;
