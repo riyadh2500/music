@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import ProfileMenu from "../Global/ProfileMenu";
 import TokenICO from "../Global/TokenICO";
 import Contract from "../Global/Contract";
+import ConvertModal from "../Global/ConvertModal";
 import CreateAccount from "../CreateAccount/CreateAccount";
 
 const SUGGESTIONS = [
@@ -24,6 +25,7 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
   // Modals
   const [showTokenICO, setShowTokenICO]           = useState(false);
   const [showContract, setShowContract]           = useState(false);
+  const [showConvert, setShowConvert]             = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
 
   const notifRef  = useRef();
@@ -203,6 +205,20 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
           📄 Contract
         </button>
 
+        {/* Convert button */}
+        <button
+          onClick={() => setShowConvert(true)}
+          style={{
+            display: "flex", alignItems: "center", gap: 7,
+            background: "#fff", color: "#059669",
+            border: "1px solid #a7f3d0", borderRadius: 8,
+            padding: "8px 14px", fontSize: 13, fontWeight: 500, cursor: "pointer",
+          }}
+          title="Convert MUSIC tokens to ETH"
+        >
+          🔄 Convert
+        </button>
+
         {/* Upload */}
         <Link href="/create">
           <button
@@ -354,6 +370,7 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
       {/* Modals */}
       {showTokenICO && <TokenICO onClose={() => setShowTokenICO(false)} user={user} />}
       {showContract && <Contract onClose={() => setShowContract(false)} walletAddress={null} />}
+      {showConvert  && <ConvertModal onClose={() => setShowConvert(false)} user={user} />}
       {showCreateAccount && (
         <CreateAccount
           onClose={() => setShowCreateAccount(false)}

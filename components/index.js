@@ -24,6 +24,7 @@ import UserProfile from "./UserProfile/UserProfile";
 import CreateAccount from "./CreateAccount/CreateAccount";
 import CommentComp from "./Comment/CommentComp";
 import Contract from "./Global/Contract";
+import ConvertModal from "./Global/ConvertModal";
 import MobilePlay from "./Global/MobilePlay";
 
 export {
@@ -53,5 +54,6 @@ export {
   CreateAccount,
   CommentComp,
   Contract,
+  ConvertModal,
   MobilePlay,
 };
