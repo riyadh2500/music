@@ -3,7 +3,7 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FiMessageCircle, FiShare2, FiDownload } from "react-icons/fi";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import toast from "react-hot-toast";
-import { AudioPlayerContext } from "../../Context/AudioPlayerContext";
+import { AudioPlayerContext } from "../../context/AudioPlayerContext";
 
 const GENRE_COLORS = {
   Electronic: "#8b5cf6", "Hip-Hop": "#f59e0b",

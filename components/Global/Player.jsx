@@ -9,7 +9,7 @@ import {
 } from "react-icons/bs";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { HiOutlineVolumeUp, HiOutlineVolumeOff } from "react-icons/hi";
-import { AudioPlayerContext } from "../../Context/AudioPlayerContext";
+import { AudioPlayerContext } from "../../context/AudioPlayerContext";
 
 const fmt = (s) => {
   const m = Math.floor(s / 60);

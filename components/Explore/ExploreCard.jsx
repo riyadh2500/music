@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import toast from "react-hot-toast";
-import { AudioPlayerContext } from "../../Context/AudioPlayerContext";
+import { AudioPlayerContext } from "../../context/AudioPlayerContext";
 
 const ExploreCard = ({ item, user }) => {
   const [liked, setLiked] = useState(false);

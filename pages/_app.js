@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { supabase } from "../lib/supabase";
-import { AudioPlayerProvider } from "../Context/AudioPlayerContext";
+import { AudioPlayerProvider } from "../context/AudioPlayerContext";
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }) {
