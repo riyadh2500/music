@@ -12,7 +12,7 @@ const PACKAGES = [
   { id: 1, tokens: 100,  price: "0.01", label: "Starter" },
   { id: 2, tokens: 500,  price: "0.04", label: "Creator", popular: true },
   { id: 3, tokens: 1000, price: "0.07", label: "Pro" },
-  { id: 4, tokens: 5000, price: "0.30", label: "Studio" },
+  { id: 4, tokens: 5000, price: "0.35", label: "Studio" },
 ];
 
 const TokenICO = ({ onClose, user }) => {
