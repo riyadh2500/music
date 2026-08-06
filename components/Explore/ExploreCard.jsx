@@ -28,10 +28,30 @@ const ExploreCard = ({ item, user }) => {
     }
   };
 
-  const handleLike = (e) => {
+  const handleLike = async (e) => {
     e.stopPropagation();
-    setLiked((l) => !l);
-    toast(liked ? "Removed from liked songs" : "Added to liked songs ❤️");
+    if (!user) { toast.error("Sign in to like tracks"); return; }
+
+    // Optimistic update
+    const next = !liked;
+    setLiked(next);
+    toast(next ? "Added to liked songs ❤️" : "Removed from liked songs");
+
+    try {
+      const res = await fetch("/api/likes", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ postId: item.id, userId: user.id }),
+      });
+      if (!res.ok) {
+        // Roll back on failure
+        setLiked(!next);
+        toast.error("Couldn't update like. Try again.");
+      }
+    } catch {
+      setLiked(!next);
+      toast.error("Couldn't update like. Try again.");
+    }
   };
 
   // Determine cover — DB returns snake_case (cover_url, cover_gradient)

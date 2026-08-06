@@ -1,5 +1,22 @@
 import { supabaseAdmin as supabase } from "../../../lib/supabaseAdmin";
 
+// ── helper: silently insert a notification ───────────────────────────────────
+async function notify({ userId, actorId, type, postId = null, message }) {
+  if (userId === actorId) return;
+  try {
+    await supabase.from("notifications").insert({
+      user_id:  userId,
+      actor_id: actorId,
+      type,
+      post_id:  postId,
+      message,
+      read:     false,
+    });
+  } catch (e) {
+    console.error("notify() failed:", e);
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -14,7 +31,7 @@ export default async function handler(req, res) {
   const DOWNLOAD_COST = 10; // MUSIC tokens
 
   try {
-    // Get post and creator info
+    // ── Get post and creator info ────────────────────────────────────────
     const { data: post, error: postErr } = await supabase
       .from("posts")
       .select("id, user_id, title, audio_url")
@@ -34,10 +51,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "You can't download your own track" });
     }
 
-    // Get downloader balance
+    // ── Get downloader balance ───────────────────────────────────────────
     const { data: downloader, error: downloaderErr } = await supabase
       .from("profiles")
-      .select("id, music_tokens")
+      .select("id, username, music_tokens")
       .eq("id", userId)
       .single();
 
@@ -55,7 +72,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Get creator balance
+    // ── Get creator balance ──────────────────────────────────────────────
     const { data: creator, error: creatorErr } = await supabase
       .from("profiles")
       .select("id, music_tokens")
@@ -68,27 +85,33 @@ export default async function handler(req, res) {
 
     const creatorBalance = creator.music_tokens ?? 0;
 
-    // Deduct from downloader
+    // ── Deduct from downloader ───────────────────────────────────────────
     await supabase
       .from("profiles")
       .update({ music_tokens: downloaderBalance - DOWNLOAD_COST })
       .eq("id", userId);
 
-    // Add to creator
+    // ── Credit creator ───────────────────────────────────────────────────
     await supabase
       .from("profiles")
       .update({ music_tokens: creatorBalance + DOWNLOAD_COST })
       .eq("id", post.user_id);
 
-    // Log the download transaction (optional - you can create a downloads table later)
-    // For now, just return success
+    // ── Notify creator: purchase notification with token credit info ─────
+    await notify({
+      userId:  post.user_id,
+      actorId: userId,
+      type:    "download",
+      postId,
+      message: `purchased your track "${post.title || "your track"}" — you earned ${DOWNLOAD_COST} MUSIC tokens 🎵`,
+    });
 
     return res.status(200).json({
-      success: true,
-      downloadUrl: post.audio_url,
+      success:        true,
+      downloadUrl:    post.audio_url,
       tokensDeducted: DOWNLOAD_COST,
-      newBalance: downloaderBalance - DOWNLOAD_COST,
-      creatorEarned: DOWNLOAD_COST,
+      newBalance:     downloaderBalance - DOWNLOAD_COST,
+      creatorEarned:  DOWNLOAD_COST,
     });
   } catch (error) {
     console.error("Download error:", error);
