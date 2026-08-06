@@ -101,7 +101,7 @@ export default async function handler(req, res) {
     await notify({
       userId:  post.user_id,
       actorId: userId,
-      type:    "download",
+      type:    "purchase",
       postId,
       message: `purchased your track "${post.title || "your track"}" — you earned ${DOWNLOAD_COST} MUSIC tokens 🎵`,
     });
