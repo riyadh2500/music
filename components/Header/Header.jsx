@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { FiSearch, FiBell, FiUpload, FiX } from "react-icons/fi";
+import { useRouter } from "next/router";
+import { FiSearch, FiBell, FiUpload, FiX, FiMusic } from "react-icons/fi";
 import toast from "react-hot-toast";
 import ProfileMenu from "../Global/ProfileMenu";
 import TokenICO from "../Global/TokenICO";
@@ -8,18 +9,18 @@ import Contract from "../Global/Contract";
 import ConvertModal from "../Global/ConvertModal";
 import CreateAccount from "../CreateAccount/CreateAccount";
 
-const SUGGESTIONS = [
-  "Midnight Vibes", "Neon Dreamer", "Chain Reaction",
-  "CryptoBeats", "SynthWave3", "Web3Artist", "BlockchainDJ",
-];
-
+// remove static suggestions — we now use live DB results
 
 const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
-  const [search, setSearch] = useState("");
+  const router = useRouter();
+
+  const [search, setSearch]                 = useState("");
+  const [searchResults, setSearchResults]   = useState([]);
+  const [searchLoading, setSearchLoading]   = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifications, setNotifications]   = useState([]);
+  const [notifLoading, setNotifLoading]     = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   // Modals
@@ -31,8 +32,33 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
   const notifRef  = useRef();
   const searchRef = useRef();
   const walletRef = useRef();
+  const debounceRef = useRef(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // ── Live search against real DB ────────────────────────
+  const runSearch = useCallback(async (term) => {
+    if (!term.trim()) { setSearchResults([]); setSearchLoading(false); return; }
+    setSearchLoading(true);
+    try {
+      const res  = await fetch(`/api/posts?limit=8&search=${encodeURIComponent(term.trim())}`);
+      const data = await res.json();
+      setSearchResults(data.posts || []);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, []);
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearch(val);
+    setShowSuggestions(true);
+    clearTimeout(debounceRef.current);
+    if (!val.trim()) { setSearchResults([]); return; }
+    debounceRef.current = setTimeout(() => runSearch(val), 300);
+  };
 
   // ── Fetch real notifications ───────────────────────────
   const fetchNotifications = async () => {
@@ -73,13 +99,12 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
   };
 
-  const suggestions = search.length > 0
-    ? SUGGESTIONS.filter((s) => s.toLowerCase().includes(search.toLowerCase()))
-    : [];
-
   const handleSearch = (e) => {
     e.preventDefault();
-    if (search.trim()) { setShowSuggestions(false); toast(`Searching for "${search}"…`, { icon: "🔍" }); }
+    if (search.trim()) {
+      setShowSuggestions(false);
+      router.push(`/explore?q=${encodeURIComponent(search.trim())}`);
+    }
   };
 
   const handleWalletClick = () => {
@@ -127,17 +152,24 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
                 type="text"
                 placeholder="Search artists, songs, playlists..."
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setShowSuggestions(true); }}
-                onFocus={() => setShowSuggestions(true)}
+                onChange={handleSearchChange}
+                onFocus={() => search.trim() && setShowSuggestions(true)}
                 style={{
                   border: "none", outline: "none", background: "transparent",
                   fontSize: 14, width: "100%", color: "#171717",
                 }}
               />
-              {search && (
+              {searchLoading && (
+                <span style={{
+                  width: 12, height: 12, border: "2px solid #e5e5e5",
+                  borderTopColor: "#10b981", borderRadius: "50%",
+                  display: "inline-block", animation: "spin 0.7s linear infinite", flexShrink: 0,
+                }} />
+              )}
+              {search && !searchLoading && (
                 <button
                   type="button"
-                  onClick={() => { setSearch(""); setShowSuggestions(false); }}
+                  onClick={() => { setSearch(""); setSearchResults([]); setShowSuggestions(false); }}
                   style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}
                 >
                   <FiX size={14} color="#a3a3a3" />
@@ -146,28 +178,76 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
             </div>
           </form>
 
-          {showSuggestions && suggestions.length > 0 && (
-            <div
-              style={{
-                position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
-                background: "#fff", border: "1px solid #e5e5e5", borderRadius: 8,
-                boxShadow: "0 8px 24px rgba(0,0,0,0.1)", zIndex: 9999, overflow: "hidden",
-              }}
-            >
-              {suggestions.map((s) => (
-                <div
-                  key={s}
-                  onClick={() => { setSearch(s); setShowSuggestions(false); toast(`Searching "${s}"…`, { icon: "🔍" }); }}
-                  style={{
-                    padding: "10px 14px", fontSize: 13, color: "#171717",
-                    cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f5f5")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                >
-                  <FiSearch size={12} color="#a3a3a3" /> {s}
+          {/* Live results dropdown */}
+          {showSuggestions && search.trim() && (
+            <div style={{
+              position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
+              background: "#fff", border: "1px solid #e5e5e5", borderRadius: 8,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.1)", zIndex: 9999, overflow: "hidden",
+            }}>
+              {searchLoading ? (
+                <div style={{ padding: "14px 16px", fontSize: 13, color: "#a3a3a3", textAlign: "center" }}>
+                  Searching…
                 </div>
-              ))}
+              ) : searchResults.length === 0 ? (
+                <div style={{ padding: "14px 16px", fontSize: 13, color: "#a3a3a3", textAlign: "center" }}>
+                  No results for &ldquo;{search}&rdquo;
+                </div>
+              ) : (
+                <>
+                  {searchResults.map((track) => (
+                    <div
+                      key={track.id}
+                      onClick={() => {
+                        setShowSuggestions(false);
+                        router.push(`/explore?q=${encodeURIComponent(search.trim())}`);
+                      }}
+                      style={{
+                        padding: "10px 14px", fontSize: 13, color: "#171717",
+                        cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
+                        borderBottom: "1px solid #f5f5f5",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f5f5")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    >
+                      {/* Cover or music icon */}
+                      {track.cover_url ? (
+                        <img src={track.cover_url} alt=""
+                          style={{ width: 36, height: 36, borderRadius: 6, objectFit: "cover", flexShrink: 0 }} />
+                      ) : (
+                        <div style={{
+                          width: 36, height: 36, borderRadius: 6, flexShrink: 0,
+                          background: track.cover_gradient || "linear-gradient(135deg,#0d3b2e,#10b981)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <FiMusic size={14} color="#fff" />
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {track.title}
+                        </div>
+                        <div style={{ fontSize: 11, color: "#a3a3a3", marginTop: 1 }}>
+                          {track.artist || track.profile?.username || "Unknown Artist"}
+                          {track.genre && <span style={{ marginLeft: 6, color: "#10b981" }}>{track.genre}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div
+                    onClick={() => { setShowSuggestions(false); router.push(`/explore?q=${encodeURIComponent(search.trim())}`); }}
+                    style={{
+                      padding: "10px 14px", fontSize: 12, color: "#10b981",
+                      cursor: "pointer", textAlign: "center", fontWeight: 600,
+                      borderTop: "1px solid #f0f0f0",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#f0fdf4")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    See all results for &ldquo;{search}&rdquo; →
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

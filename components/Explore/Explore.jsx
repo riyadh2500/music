@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import ExploreCard from "./ExploreCard";
 
 const GENRES = ["All", "Electronic", "Hindi", "Artistic", "Pop", "Japanese", "Other"];
 
 const Explore = ({ user }) => {
+  const router = useRouter();
   const [activeGenre, setActiveGenre] = useState("All");
   const [search, setSearch] = useState("");
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch tracks from API
+  // Pre-fill search from URL query param (?q=...)
+  useEffect(() => {
+    if (router.query.q) setSearch(router.query.q);
+  }, [router.query.q]);
+
+  // Fetch tracks from API (with optional search)
   useEffect(() => {
     const fetchTracks = async () => {
       setLoading(true);
       try {
-        const genreParam = activeGenre !== "All" ? `&genre=${activeGenre}` : "";
-        const res = await fetch(`/api/posts?limit=100${genreParam}`);
+        const genreParam  = activeGenre !== "All" ? `&genre=${activeGenre}` : "";
+        const searchParam = search.trim() ? `&search=${encodeURIComponent(search.trim())}` : "";
+        const res  = await fetch(`/api/posts?limit=100${genreParam}${searchParam}`);
         const data = await res.json();
         setTracks(data.posts || []);
       } catch (err) {
@@ -26,16 +34,10 @@ const Explore = ({ user }) => {
       }
     };
     fetchTracks();
-  }, [activeGenre]);
+  }, [activeGenre, search]);
 
-  const filtered = tracks.filter((t) => {
-    const matchSearch =
-      search === "" ||
-      t.title?.toLowerCase().includes(search.toLowerCase()) ||
-      t.artist?.toLowerCase().includes(search.toLowerCase()) ||
-      t.profile?.username?.toLowerCase().includes(search.toLowerCase());
-    return matchSearch;
-  });
+  // DB handles both genre + search filtering; show all returned tracks
+  const filtered = tracks;
 
   return (
     <div>

@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 
   // GET /api/posts
   if (req.method === "GET") {
-    const { limit = 20, offset = 0, genre, userId } = req.query;
+    const { limit = 20, offset = 0, genre, userId, search } = req.query;
 
     let query = supabase
       .from("posts")
@@ -19,6 +19,11 @@ export default async function handler(req, res) {
 
     if (genre && genre !== "All") query = query.eq("genre", genre);
     if (userId) query = query.eq("user_id", userId);
+    if (search && search.trim()) {
+      query = query.or(
+        `title.ilike.%${search.trim()}%,artist.ilike.%${search.trim()}%`
+      );
+    }
 
     const { data, error } = await query;
     if (error) return res.status(400).json({ error: error.message });
