@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import ExploreCard from "./ExploreCard";
 
@@ -7,22 +7,33 @@ const GENRES = ["All", "Electronic", "Hindi", "Artistic", "Pop", "Japanese", "Ot
 const Explore = ({ user }) => {
   const router = useRouter();
   const [activeGenre, setActiveGenre] = useState("All");
-  const [search, setSearch] = useState("");
+  // Initialise search from URL — avoids the "flash all then filter" race
+  const [search, setSearch] = useState(() =>
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("q") || ""
+      : ""
+  );
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const debounceRef = useRef(null);
 
-  // Pre-fill search from URL query param (?q=...)
+  // Keep search in sync if the URL changes externally (e.g. header search)
   useEffect(() => {
-    if (router.query.q) setSearch(router.query.q);
-  }, [router.query.q]);
+    if (router.isReady && router.query.q !== undefined) {
+      setSearch(router.query.q || "");
+    }
+  }, [router.isReady, router.query.q]);
 
-  // Fetch tracks from API (with optional search)
+  // Fetch — only runs after router is ready so we always have the correct query
   useEffect(() => {
-    const fetchTracks = async () => {
+    if (!router.isReady) return;
+
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const genreParam  = activeGenre !== "All" ? `&genre=${activeGenre}` : "";
-        const searchParam = search.trim() ? `&search=${encodeURIComponent(search.trim())}` : "";
+        const genreParam  = activeGenre !== "All" ? `&genre=${encodeURIComponent(activeGenre)}` : "";
+        const searchParam = search.trim()         ? `&search=${encodeURIComponent(search.trim())}` : "";
         const res  = await fetch(`/api/posts?limit=100${genreParam}${searchParam}`);
         const data = await res.json();
         setTracks(data.posts || []);
@@ -32,9 +43,10 @@ const Explore = ({ user }) => {
       } finally {
         setLoading(false);
       }
-    };
-    fetchTracks();
-  }, [activeGenre, search]);
+    }, search.trim() ? 300 : 0); // debounce typing, instant on genre change
+
+    return () => clearTimeout(debounceRef.current);
+  }, [router.isReady, activeGenre, search]);
 
   // DB handles both genre + search filtering; show all returned tracks
   const filtered = tracks;
