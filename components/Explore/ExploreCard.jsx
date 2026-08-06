@@ -34,10 +34,11 @@ const ExploreCard = ({ item, user }) => {
     toast(liked ? "Removed from liked songs" : "Added to liked songs ❤️");
   };
 
-  // Determine cover image or gradient
-  const coverStyle = item.coverUrl
-    ? { backgroundImage: `url(${item.coverUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
-    : { background: item.coverGradient || "linear-gradient(135deg,#1e3a5f,#0f2027)" };
+  // Determine cover — DB returns snake_case (cover_url, cover_gradient)
+  const coverSrc = item.cover_url || item.coverUrl;
+  const coverStyle = coverSrc
+    ? { backgroundImage: `url(${coverSrc})`, backgroundSize: "cover", backgroundPosition: "center" }
+    : { background: item.cover_gradient || item.coverGradient || "linear-gradient(135deg,#1e3a5f,#0f2027)" };
 
   return (
     <div

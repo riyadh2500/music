@@ -60,22 +60,24 @@ const Player = () => {
     >
       {/* Track info */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, width: 220, flexShrink: 0 }}>
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 6,
-            background: currentTrack.coverUrl ? `url(${currentTrack.coverUrl})` : (currentTrack.coverGradient || "linear-gradient(135deg,#10b981,#059669)"),
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          {!currentTrack.coverUrl && <span style={{ fontSize: 20 }}>🎵</span>}
-        </div>
+        {/* support both snake_case (DB) and camelCase */}
+        {(() => {
+          const coverSrc = currentTrack.cover_url || currentTrack.coverUrl;
+          const coverBg  = currentTrack.cover_gradient || currentTrack.coverGradient;
+          return (
+            <div
+              style={{
+                width: 44, height: 44, borderRadius: 6, flexShrink: 0,
+                background: coverSrc
+                  ? `url(${coverSrc}) center/cover no-repeat`
+                  : (coverBg || "linear-gradient(135deg,#10b981,#059669)"),
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              {!coverSrc && <span style={{ fontSize: 20 }}>🎵</span>}
+            </div>
+          );
+        })()}
         <div style={{ overflow: "hidden" }}>
           <div
             style={{

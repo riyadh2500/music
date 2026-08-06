@@ -39,19 +39,33 @@ export const AudioPlayerProvider = ({ children }) => {
   }, []);
 
   const playTrack = (track) => {
-    if (typeof window === "undefined" || !track?.audioUrl) return;
+    if (typeof window === "undefined") return;
+
+    // Support both snake_case (from DB) and camelCase field names
+    const audioSrc = track?.audio_url || track?.audioUrl;
+    if (!audioSrc) {
+      console.warn("playTrack: no audio URL on track", track);
+      return;
+    }
 
     if (currentTrack?.id === track.id && audioRef.current?.src) {
       // Resume same track
-      audioRef.current.play();
+      audioRef.current.play().catch(console.error);
       setIsPlaying(true);
     } else {
-      // Load new track
-      setCurrentTrack(track);
+      // Load new track — normalise to a consistent shape
+      const normalisedTrack = {
+        ...track,
+        audioUrl: audioSrc,
+        audio_url: audioSrc,
+        coverUrl:  track.cover_url  || track.coverUrl  || null,
+        cover_url: track.cover_url  || track.coverUrl  || null,
+      };
+      setCurrentTrack(normalisedTrack);
       if (audioRef.current) {
-        audioRef.current.src = track.audioUrl;
+        audioRef.current.src = audioSrc;
         audioRef.current.load();
-        audioRef.current.play();
+        audioRef.current.play().catch(console.error);
       }
       setIsPlaying(true);
       setProgress(0);
