@@ -54,8 +54,8 @@ const TokenICO = ({ onClose, user }) => {
   };
 
   useEffect(() => {
-    // Don't auto-fetch on mount to avoid errors - user can click refresh
-  }, []);
+    fetchBalance();
+  }, [user?.id]);
 
   // ── Option A: Pay via MetaMask (if installed) ──────────
   const payWithMetaMask = async () => {
@@ -206,8 +206,21 @@ const TokenICO = ({ onClose, user }) => {
                 display: "flex", justifyContent: "space-between", alignItems: "center",
               }}>
                 <div style={{ fontSize: 12, color: "#065f46" }}>Your MUSIC Balance</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#059669" }}>
-                  {balanceLoading ? "…" : `${(musicBalance ?? 0).toLocaleString()} MUSIC`}
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#059669" }}>
+                    {balanceLoading ? "…" : `${(musicBalance ?? 0).toLocaleString()} MUSIC`}
+                  </div>
+                  <button
+                    onClick={fetchBalance}
+                    disabled={balanceLoading}
+                    style={{
+                      background: "none", border: "none", cursor: balanceLoading ? "not-allowed" : "pointer",
+                      display: "flex", alignItems: "center", padding: 2,
+                    }}
+                    title="Refresh balance"
+                  >
+                    <FiRefreshCw size={13} color="#059669" style={{ animation: balanceLoading ? "spin 1s linear infinite" : "none" }} />
+                  </button>
                 </div>
               </div>
 
