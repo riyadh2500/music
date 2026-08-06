@@ -11,12 +11,20 @@ const GENRE_COLORS = {
 };
 
 const Post = ({ post, user }) => {
-  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(AudioPlayerContext);
+  const context = useContext(AudioPlayerContext);
   const initialLikes    = post?.likes?.[0]?.count ?? 0;
   const initialComments = post?.comments?.[0]?.count ?? 0;
 
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(initialLikes);
+
+  // Safely destructure (context might be null during SSR)
+  const {
+    currentTrack = null,
+    isPlaying = false,
+    playTrack = () => {},
+    pauseTrack = () => {},
+  } = context || {};
 
   const audioUrl = post?.audio_url || post?.audioUrl;
   const isCurrentTrack = currentTrack?.id === post?.id;

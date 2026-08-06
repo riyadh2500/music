@@ -18,10 +18,22 @@ const fmt = (s) => {
 };
 
 const Player = () => {
-  const { currentTrack, isPlaying, progress, duration, playTrack, pauseTrack, seekTo, setVolume: setVol } = useContext(AudioPlayerContext);
+  const context = useContext(AudioPlayerContext);
   const [volume, setVolume] = useState(80);
   const [muted, setMuted] = useState(false);
   const [liked, setLiked] = useState(false);
+
+  // Safely destructure context (might be null during SSR)
+  const {
+    currentTrack = null,
+    isPlaying = false,
+    progress = 0,
+    duration = 0,
+    playTrack = () => {},
+    pauseTrack = () => {},
+    seekTo = () => {},
+    setVolume: setVol = () => {},
+  } = context || {};
 
   if (!currentTrack) {
     return null; // Hide player when no track is loaded

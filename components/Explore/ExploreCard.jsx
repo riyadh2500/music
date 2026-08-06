@@ -6,7 +6,15 @@ import { AudioPlayerContext } from "../../Context/AudioPlayerContext";
 
 const ExploreCard = ({ item, user }) => {
   const [liked, setLiked] = useState(false);
-  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(AudioPlayerContext) || {};
+  const context = useContext(AudioPlayerContext);
+  
+  // Safely destructure (context might be null during SSR)
+  const {
+    currentTrack = null,
+    isPlaying = false,
+    playTrack = () => {},
+    pauseTrack = () => {},
+  } = context || {};
 
   const isCurrentTrack = currentTrack?.id === item.id;
   const isThisPlaying = isCurrentTrack && isPlaying;
