@@ -36,5 +36,8 @@
     "stripe": "^14.16.0",
     "wavesurfer.js": "^7.7.5",
     "web3modal": "^1.9.5"
+  },
+  "devDependencies": {
+    "ignore-loader": "^0.1.2"
   }
 }

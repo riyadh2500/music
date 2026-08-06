@@ -1,0 +1,5 @@
+*.sql
+.env.local
+.env*.local
+supabase-*.sql
+Api/uploads/

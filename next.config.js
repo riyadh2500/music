@@ -12,6 +12,15 @@ const nextConfig = {
   images: {
     domains: ['tciisbcovaipusfyofpt.supabase.co'],
   },
+
+  // Exclude problematic files from webpack
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(sql|env\.local)$/,
+      loader: 'ignore-loader',
+    });
+    return config;
+  },
 };
 
 module.exports = nextConfig;
