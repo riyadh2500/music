@@ -4,16 +4,18 @@ import { useRouter } from "next/router";
 import {
   AiOutlineHome,
   AiOutlineUser, AiOutlineBell,
+  AiOutlineCompass,
 } from "react-icons/ai";
 import { BsMusicNote, BsPlusCircle } from "react-icons/bs";
 import { RiUserStarLine } from "react-icons/ri";
 
 const NAV = [
   { label: "Home",          href: "/",             icon: <AiOutlineHome size={20} /> },
-  { label: "Creators",      href: "/creator",       icon: <RiUserStarLine size={20} /> },
-  { label: "Upload",        href: "/create",        icon: <BsPlusCircle size={20} /> },
-  { label: "Notifications", href: "/notifications", icon: <AiOutlineBell size={20} /> },
-  { label: "Profile",       href: "/profile",       icon: <AiOutlineUser size={20} /> },
+  { label: "Explore",       href: "/explore",      icon: <AiOutlineCompass size={20} /> },
+  { label: "Creators",      href: "/creator",      icon: <RiUserStarLine size={20} /> },
+  { label: "Upload",        href: "/create",       icon: <BsPlusCircle size={20} /> },
+  { label: "Notifications", href: "/notifications",icon: <AiOutlineBell size={20} /> },
+  { label: "Profile",       href: "/profile",      icon: <AiOutlineUser size={20} /> },
 ];
 
 const Sidebar = () => {
