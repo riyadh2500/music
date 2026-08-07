@@ -133,9 +133,14 @@ const Header = ({ onLogout, onLoginWithEmail, onRegisterWithEmail, user }) => {
       <header
         style={{
           position: "fixed", top: 0, left: 240, right: 0, height: 64,
-          backgroundColor: "#fff", borderBottom: "1px solid #e5e5e5",
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(16,185,129,0.1)",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
           display: "flex", alignItems: "center", padding: "0 24px",
           gap: 14, zIndex: 1300,
+          animation: "fadeIn 0.5s ease-out",
         }}
       >
         {/* Search */}

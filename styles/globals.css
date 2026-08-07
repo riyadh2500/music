@@ -34,10 +34,12 @@
 html,
 body {
   font-family: var(--fonts-base);
-  background-color: #fafafa;
+  background: linear-gradient(135deg, #020c07 0%, #041a0e 30%, #051f10 60%, #020c07 100%);
+  background-attachment: fixed;
   color: #171717;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 a {
@@ -198,6 +200,59 @@ select {
   0%, 100% { transform: scaleY(0.3); }
   50%       { transform: scaleY(1);   }
 }
+
+/* ── Glass morphism cards ── */
+.glass {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+.glass-dark {
+  background: rgba(10, 20, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(16,185,129,0.15);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* ── Glow effects ── */
+.glow-green {
+  box-shadow: 0 0 20px rgba(16,185,129,0.3), 0 0 40px rgba(16,185,129,0.1);
+}
+
+/* ── Gradient text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Neon border ── */
+.neon-border {
+  border: 1px solid rgba(16,185,129,0.4);
+  box-shadow: inset 0 0 20px rgba(16,185,129,0.05), 0 0 20px rgba(16,185,129,0.1);
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(16,185,129,0.3); }
+  50%       { box-shadow: 0 0 30px rgba(16,185,129,0.6), 0 0 60px rgba(16,185,129,0.2); }
+}
+
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
 /* ────────────────────────────────────────────────────────── */
 
 /* Progress bar */

@@ -107,12 +107,22 @@ const Post = ({ post, user }) => {
   return (
     <div
       style={{
-        background: "#fff", border: "1px solid #e5e5e5",
+        background: "rgba(255,255,255,0.95)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        border: "1px solid rgba(16,185,129,0.08)",
         borderRadius: 12, overflow: "hidden", marginBottom: 16,
-        transition: "box-shadow 0.2s",
+        transition: "box-shadow 0.2s, transform 0.2s",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.07)")}
-      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.1), 0 0 0 1px rgba(16,185,129,0.1)";
+        e.currentTarget.style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.04)";
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
     >
       {/* Cover */}
       <div

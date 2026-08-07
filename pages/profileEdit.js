@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import MusicBackground from "../components/Global/MusicBackground";
 import { Header, Sidebar, Player, Footer } from "../components";
 import { FiCamera, FiUploadCloud } from "react-icons/fi";
 import toast from "react-hot-toast";
@@ -103,6 +104,7 @@ const ProfileEdit = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) 
 
   return (
     <>
+      <MusicBackground />
       <Sidebar />
       <Header
         user={user}
@@ -113,7 +115,7 @@ const ProfileEdit = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) 
       <main style={{
         marginLeft: 240, marginTop: 64, marginBottom: 72,
         padding: "28px 32px", minHeight: "calc(100vh - 64px - 72px)",
-        background: "#fafafa",
+        background: "transparent",
       }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: "#171717", marginBottom: 28 }}>

@@ -76,17 +76,21 @@ const ExploreCard = ({ item, user }) => {
   return (
     <div
       style={{
-        background: "#fff", border: "1px solid #e5e5e5",
+        background: "rgba(255,255,255,0.95)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        border: "1px solid rgba(16,185,129,0.08)",
         borderRadius: 12, overflow: "hidden", cursor: "pointer",
         transition: "transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-6px) scale(1.02)";
-        e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.13)";
+        e.currentTarget.style.boxShadow = "0 20px 50px rgba(0,0,0,0.12), 0 0 0 1px rgba(16,185,129,0.15)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0) scale(1)";
-        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.04)";
       }}
     >
       <div

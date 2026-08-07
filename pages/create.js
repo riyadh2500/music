@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import MusicBackground from "../components/Global/MusicBackground";
 import { useRouter } from "next/router";
 import { Header, Sidebar, Player, Footer } from "../components";
 import { FiMusic, FiImage, FiUploadCloud } from "react-icons/fi";
@@ -147,6 +148,7 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
 
   return (
     <>
+      <MusicBackground />
       <Sidebar />
       <Header
         user={user}
@@ -156,7 +158,8 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
       />
       <main style={{
         marginLeft: 240, marginTop: 64, marginBottom: 72,
-        padding: "28px 32px", minHeight: "calc(100vh - 64px - 72px)", background: "#fafafa",
+        padding: "28px 32px", minHeight: "calc(100vh - 64px - 72px)",
+        background: "transparent", position: "relative", zIndex: 1,
       }}>
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: "#171717", marginBottom: 4 }}>Upload Music</h1>
@@ -207,8 +210,7 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
             >
               <FiMusic size={40} color={audioFile ? "#10b981" : "#a3a3a3"} style={{ marginBottom: 16 }} />
               {audioFile ? (
-                <>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: "#10b981", marginBottom: 8 }}>✓ {audioFile.name}</div>
+                <>                  <div style={{ fontSize: 16, fontWeight: 600, color: "#10b981", marginBottom: 8 }}>✓ {audioFile.name}</div>
                   <div style={{ fontSize: 13, color: "#737373", marginBottom: 20 }}>{(audioFile.size / 1024 / 1024).toFixed(2)} MB</div>
                   <label style={{ display: "inline-block", background: "#fff", color: "#10b981", padding: "8px 20px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", border: "1px solid #10b981" }}>
                     Change File <input type="file" accept="audio/*" style={{ display: "none" }} onChange={handleAudioChange} />
@@ -274,8 +276,7 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
                 {coverPreview ? (
                   <img src={coverPreview} alt="cover" style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 10, border: "1px solid #e5e5e5" }} />
                 ) : (
-                  <>
-                    <div style={{ fontSize: 12, color: "#a3a3a3", marginBottom: 8 }}>Or pick a gradient:</div>
+                  <>                  <div style={{ fontSize: 12, color: "#a3a3a3", marginBottom: 8 }}>Or pick a gradient:</div>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       {GRADIENTS.map((g) => (
                         <div key={g} onClick={() => setSelectedGradient(g)}
@@ -316,7 +317,7 @@ const CreatePage = ({ user, onLoginWithEmail, onRegisterWithEmail, onLogout }) =
               <div style={{ background: "#f0fdf4", border: "1px solid #a7f3d0", borderRadius: 8, padding: "10px 14px", marginBottom: 20, fontSize: 13, color: "#065f46" }}>
                 🎵 Publishing costs <strong>10 MUSIC tokens</strong> — deducted automatically from your balance.
               </div>
-              <div style={{ background: "#fafafa", border: "1px solid #e5e5e5", borderRadius: 8, padding: 16, textAlign: "left", marginBottom: 20 }}>
+              <div style={{ background: "transparent", border: "1px solid #e5e5e5", borderRadius: 8, padding: 16, textAlign: "left", marginBottom: 20 }}>
                 {[
                   ["File",   audioFile?.name],
                   ["Title",  form.title],

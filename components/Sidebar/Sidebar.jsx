@@ -24,7 +24,11 @@ const Sidebar = () => {
     <aside
       style={{
         position: "fixed", top: 0, left: 0, width: 240, height: "100vh",
-        background: "#fff", borderRight: "1px solid #e5e5e5",
+        background: "rgba(255,255,255,0.96)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderRight: "1px solid rgba(16,185,129,0.12)",
+        boxShadow: "4px 0 24px rgba(0,0,0,0.06)",
         display: "flex", flexDirection: "column",
         zIndex: 1400, overflowY: "auto",
         animation: "slideInLeft 0.4s cubic-bezier(0.34,1.56,0.64,1)",
