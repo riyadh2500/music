@@ -15,8 +15,9 @@ const Post = ({ post, user }) => {
   const initialLikes    = post?.likes?.[0]?.count ?? 0;
   const initialComments = post?.comments?.[0]?.count ?? 0;
 
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(initialLikes);
+  const [liked, setLiked]         = useState(false);
+  const [likes, setLikes]         = useState(initialLikes);
+  const [heartAnim, setHeartAnim] = useState(false);
 
   // Safely destructure (context might be null during SSR)
   const {
@@ -45,6 +46,10 @@ const Post = ({ post, user }) => {
     const next = !liked;
     setLiked(next);
     setLikes((n) => (next ? n + 1 : n - 1));
+    if (next) {
+      setHeartAnim(true);
+      setTimeout(() => setHeartAnim(false), 500);
+    }
     try {
       await fetch("/api/likes", {
         method: "POST",
@@ -183,6 +188,8 @@ const Post = ({ post, user }) => {
             display: "flex", alignItems: "center", gap: 6,
             background: "none", border: "none", cursor: "pointer",
             fontSize: 13, color: liked ? "#ef4444" : "#737373", padding: 0,
+            animation: heartAnim ? "heartBurst 0.5s ease-out" : "none",
+            transition: "color 0.2s",
           }}>
             {liked ? <AiFillHeart size={17} /> : <AiOutlineHeart size={17} />}
             {likes}

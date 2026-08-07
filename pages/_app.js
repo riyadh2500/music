@@ -83,17 +83,22 @@ export default function App({ Component, pageProps }) {
 
   return (
     <AudioPlayerProvider>
-      <Component
-        {...pageProps}
-        user={user}
-        onLoginWithEmail={loginWithEmail}
-        onRegisterWithEmail={registerWithEmail}
-        onLogout={logout}
-      />
+      <div style={{ animation: "fadeIn 0.4s ease-out" }}>
+        <Component
+          {...pageProps}
+          user={user}
+          onLoginWithEmail={loginWithEmail}
+          onRegisterWithEmail={registerWithEmail}
+          onLogout={logout}
+        />
+      </div>
       <Toaster
         position="top-right"
         toastOptions={{
-          style: { fontSize: 13, borderRadius: 8 },
+          style: {
+            fontSize: 13, borderRadius: 8,
+            animation: "slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+          },
           success: { iconTheme: { primary: "#10b981", secondary: "#fff" } },
         }}
       />
