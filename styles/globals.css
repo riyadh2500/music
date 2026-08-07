@@ -188,6 +188,16 @@ select {
 .equalizer-bar {
   animation: equalizer 0.8s ease-in-out infinite;
 }
+
+@keyframes slideInLeft {
+  from { transform: translateX(-30px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.3); }
+  50%       { transform: scaleY(1);   }
+}
 /* ────────────────────────────────────────────────────────── */
 
 /* Progress bar */

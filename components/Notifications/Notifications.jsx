@@ -167,15 +167,24 @@ const Notifications = ({ user }) => {
             <div
               key={n.id}
               onClick={() => markRead(n.id)}
+              className="animate-slideUp"
               style={{
                 display: "flex", alignItems: "flex-start", gap: 14,
                 padding: "14px 18px",
                 borderBottom: i < filtered.length - 1 ? "1px solid #f9f9f9" : "none",
                 background: n.read ? "#fff" : "#f0fdf4",
-                cursor: "pointer", transition: "background 0.15s",
+                cursor: "pointer", transition: "background 0.15s, transform 0.15s",
+                animationDelay: `${i * 0.05}s`,
+                animationFillMode: "backwards",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f5f5")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = n.read ? "#fff" : "#f0fdf4")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#f5f5f5";
+                e.currentTarget.style.transform = "translateX(4px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = n.read ? "#fff" : "#f0fdf4";
+                e.currentTarget.style.transform = "translateX(0)";
+              }}
             >
               {/* Icon */}
               <div style={{
@@ -183,6 +192,7 @@ const Notifications = ({ user }) => {
                 background: TYPE_BG[n.type] || "#f5f5f5",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
+                transition: "transform 0.2s",
               }}>
                 {TYPE_ICONS[n.type] || <FiBell size={15} color="#737373" />}
               </div>
@@ -203,6 +213,7 @@ const Notifications = ({ user }) => {
                 <div style={{
                   width: 8, height: 8, borderRadius: "50%",
                   background: "#10b981", flexShrink: 0, marginTop: 4,
+                  animation: "pulse 2s ease-in-out infinite",
                 }} />
               )}
             </div>
