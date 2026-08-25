@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   // 2. Insert profile row
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .insert({ id: userId, username, email, music_tokens: 0 })
+    .insert({ id: userId, username, email, music_token_balance: 1000 })
     .select()
     .single();
 

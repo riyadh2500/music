@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const results = {};
 
   // Test 1: Can we query profiles?
-  const p = await supabase.from("profiles").select("id, username, music_tokens, wallet_address").limit(3);
+  const p = await supabase.from("profiles").select("id, username, music_token_balance, wallet_address").limit(3);
   results.profiles = { data: p.data, error: p.error?.message };
 
   // Test 2: Can we query token_purchases?

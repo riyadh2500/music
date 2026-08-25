@@ -172,7 +172,7 @@ const UserProfile = ({ user }) => {
             { label: "Uploads",   value: loading ? "…" : posts.length },
             { label: "Followers", value: loading ? "…" : followers.toLocaleString() },
             { label: "Following", value: loading ? "…" : following.toLocaleString() },
-            { label: "MUSIC",     value: loading ? "…" : (profile?.music_tokens ?? 0).toLocaleString() },
+            { label: "MUSIC",     value: loading ? "…" : (profile?.music_token_balance ?? 0).toLocaleString() },
           ].map((s) => (
             <div key={s.label}>
               <div style={{ fontSize: 18, fontWeight: 700, color: "#171717" }}>{s.value}</div>

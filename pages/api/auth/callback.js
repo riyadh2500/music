@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         id: userId, email,
         username: name || email.split("@")[0],
         avatar_url: avatar_url || null,
-        music_tokens: 0,
+        music_token_balance: 1000,
         updated_at: new Date().toISOString(),
       })
       .select().single();

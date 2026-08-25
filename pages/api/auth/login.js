@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     // Profile may not exist yet — create it
     const { data: newProfile } = await supabaseAdmin
       .from("profiles")
-      .insert({ id: data.user.id, email, username: email.split("@")[0], music_tokens: 0 })
+      .insert({ id: data.user.id, email, username: email.split("@")[0], music_token_balance: 1000 })
       .select()
       .single();
     return res.status(200).json({ user: newProfile });

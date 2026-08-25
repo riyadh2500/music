@@ -27,7 +27,7 @@ const ConvertModal = ({ onClose, user }) => {
   const tokens    = parseInt(tokensAmount, 10) || 0;
   const totalEth  = tokens * ETH_PER_TOKEN;
   const userEth   = parseFloat((totalEth * USER_SHARE).toFixed(10));
-  const balance   = user?.music_tokens ?? 0;
+  const balance   = user?.music_token_balance ?? 0;
   const hasEnough = balance >= tokens && tokens > 0;
 
   const handleConvert = async (e) => {

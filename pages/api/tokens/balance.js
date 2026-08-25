@@ -9,9 +9,9 @@ export default async function handler(req, res) {
 
   const { data } = await supabase
     .from("profiles")
-    .select("music_tokens")
+    .select("music_token_balance")
     .eq("id", userId)
     .single();
 
-  return res.status(200).json({ balance: data?.music_tokens ?? 0 });
+  return res.status(200).json({ balance: data?.music_token_balance ?? 0 });
 }
