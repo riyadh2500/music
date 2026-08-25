@@ -21,7 +21,7 @@ function decryptPrivateKey(encrypted) {
 // 1. Decrypts user's private key
 // 2. Signs + broadcasts ETH tx to RECEIVER on Sepolia
 // 3. Waits for 1 confirmation
-// 4. Credits music_tokens in Supabase
+// 4. Credits music_token_balance in Supabase
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   // ── 1. Get encrypted key from profile ────────────────
   const { data: profile, error: profileErr } = await supabase
     .from("profiles")
-    .select("id, wallet_encrypted_key, generated_wallet_address, music_tokens")
+    .select("id, wallet_encrypted_key, generated_wallet_address, music_token_balance")
     .eq("id", userId)
     .single();
 
@@ -105,9 +105,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Transaction already credited." });
   }
 
-  const newBalance = (profile.music_tokens ?? 0) + Number(tokensToCredit);
+  const newBalance = (profile.music_token_balance ?? 0) + Number(tokensToCredit);
 
-  await supabase.from("profiles").update({ music_tokens: newBalance }).eq("id", userId);
+  await supabase.from("profiles").update({ music_token_balance: newBalance }).eq("id", userId);
   await supabase.from("token_purchases").insert({
     tx_hash: tx.hash,
     wallet_address: profile.generated_wallet_address,

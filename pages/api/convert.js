@@ -76,7 +76,7 @@ export default async function handler(req, res) {
   // ── 3. Check user balance in Supabase ───────────────────────────────────
   const { data: profile, error: profileErr } = await supabase
     .from("profiles")
-    .select("music_tokens")
+    .select("music_token_balance")
     .eq("id", userId)
     .single();
 
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
     return res.status(404).json({ error: "User profile not found." });
   }
 
-  const currentBalance = profile.music_tokens ?? 0;
+  const currentBalance = profile.music_token_balance ?? 0;
   if (currentBalance < tokens) {
     return res.status(400).json({
       error: `Insufficient tokens. You have ${currentBalance} MUSIC but tried to convert ${tokens}.`,
@@ -165,7 +165,7 @@ export default async function handler(req, res) {
   const newBalance = currentBalance - tokens;
   const { error: updateErr } = await supabase
     .from("profiles")
-    .update({ music_tokens: newBalance })
+    .update({ music_token_balance: newBalance })
     .eq("id", userId);
 
   if (updateErr) {

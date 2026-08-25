@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     // ── Get downloader balance ───────────────────────────────────────────
     const { data: downloader, error: downloaderErr } = await supabase
       .from("profiles")
-      .select("id, username, music_tokens")
+      .select("id, username, music_token_balance")
       .eq("id", userId)
       .single();
 
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const downloaderBalance = downloader.music_tokens ?? 0;
+    const downloaderBalance = downloader.music_token_balance ?? 0;
     if (downloaderBalance < DOWNLOAD_COST) {
       return res.status(400).json({
         error: `Insufficient MUSIC tokens. You need ${DOWNLOAD_COST} MUSIC to download. You have ${downloaderBalance} MUSIC.`,
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
     // ── Get creator balance ──────────────────────────────────────────────
     const { data: creator, error: creatorErr } = await supabase
       .from("profiles")
-      .select("id, music_tokens")
+      .select("id, music_token_balance")
       .eq("id", post.user_id)
       .single();
 
@@ -83,18 +83,18 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Creator not found" });
     }
 
-    const creatorBalance = creator.music_tokens ?? 0;
+    const creatorBalance = creator.music_token_balance ?? 0;
 
     // ── Deduct from downloader ───────────────────────────────────────────
     await supabase
       .from("profiles")
-      .update({ music_tokens: downloaderBalance - DOWNLOAD_COST })
+      .update({ music_token_balance: downloaderBalance - DOWNLOAD_COST })
       .eq("id", userId);
 
     // ── Credit creator ───────────────────────────────────────────────────
     await supabase
       .from("profiles")
-      .update({ music_tokens: creatorBalance + DOWNLOAD_COST })
+      .update({ music_token_balance: creatorBalance + DOWNLOAD_COST })
       .eq("id", post.user_id);
 
     // ── Notify creator: purchase notification with token credit info ─────

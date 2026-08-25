@@ -86,7 +86,7 @@ export default async function handler(req, res) {
   if (userId) {
     const { data } = await supabase
       .from("profiles")
-      .select("id, music_tokens")
+      .select("id, music_token_balance")
       .eq("id", userId)
       .maybeSingle();
     profile = data;
@@ -95,7 +95,7 @@ export default async function handler(req, res) {
   if (!profile && walletAddress && walletAddress.startsWith("0x")) {
     const { data } = await supabase
       .from("profiles")
-      .select("id, music_tokens")
+      .select("id, music_token_balance")
       .eq("generated_wallet_address", walletAddress)
       .maybeSingle();
     profile = data;
@@ -104,7 +104,7 @@ export default async function handler(req, res) {
   if (!profile && walletAddress && walletAddress.startsWith("0x")) {
     const { data } = await supabase
       .from("profiles")
-      .select("id, music_tokens")
+      .select("id, music_token_balance")
       .eq("wallet_address", walletAddress)
       .maybeSingle();
     profile = data;
@@ -116,12 +116,12 @@ export default async function handler(req, res) {
     });
   }
 
-  const newBalance = (profile.music_tokens ?? 0) + Number(expectedTokens);
+  const newBalance = (profile.music_token_balance ?? 0) + Number(expectedTokens);
 
   // ── 4. Credit tokens ──────────────────────────────────
   const { error: updateErr } = await supabase
     .from("profiles")
-    .update({ music_tokens: newBalance })
+    .update({ music_token_balance: newBalance })
     .eq("id", profile.id);
 
   if (updateErr) return res.status(400).json({ error: "Token credit failed: " + updateErr.message });

@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   // Get wallet address from profile
   const { data: profile } = await supabase
     .from("profiles")
-    .select("generated_wallet_address, music_tokens")
+    .select("generated_wallet_address, music_token_balance")
     .eq("id", userId)
     .single();
 
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ethBalance,
-    musicTokens: profile.music_tokens ?? 0,
+    musicTokens: profile.music_token_balance ?? 0,
     address,
   });
 }

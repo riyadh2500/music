@@ -46,7 +46,7 @@ export default async function handler(req, res) {
     // ── Check user has enough MUSIC tokens ───────────────
     const { data: profile, error: profileErr } = await supabase
       .from("profiles")
-      .select("id, music_tokens")
+      .select("id, music_token_balance")
       .eq("id", userId)
       .single();
 
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "User profile not found." });
     }
 
-    const currentTokens = profile.music_tokens ?? 0;
+    const currentTokens = profile.music_token_balance ?? 0;
     if (currentTokens < UPLOAD_COST) {
       return res.status(400).json({
         error: `Insufficient MUSIC tokens. You need ${UPLOAD_COST} MUSIC to upload. You have ${currentTokens} MUSIC.`,
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
     // ── Deduct 10 MUSIC tokens ────────────────────────────
     await supabase
       .from("profiles")
-      .update({ music_tokens: currentTokens - UPLOAD_COST })
+      .update({ music_token_balance: currentTokens - UPLOAD_COST })
       .eq("id", userId);
 
     return res.status(201).json({
