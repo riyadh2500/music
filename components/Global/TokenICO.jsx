@@ -65,11 +65,51 @@ const TokenICO = ({ onClose, user }) => {
     }
     setLoading(true);
     try {
-      // Switch to Sepolia
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: SEPOLIA }],
+      // First, request account access
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
       });
+      
+      if (!accounts || accounts.length === 0) {
+        toast.error("Please connect your wallet first.");
+        setLoading(false);
+        return;
+      }
+
+      // Switch to Sepolia
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: SEPOLIA }],
+        });
+      } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask
+        if (switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: SEPOLIA,
+                chainName: "Sepolia Testnet",
+                nativeCurrency: {
+                  name: "ETH",
+                  symbol: "ETH",
+                  decimals: 18,
+                },
+                rpcUrls: ["https://sepolia.infura.io/v3/"],
+                blockExplorerUrls: ["https://sepolia.etherscan.io"],
+              }],
+            });
+          } catch (addError) {
+            toast.error("Failed to add Sepolia network");
+            setLoading(false);
+            return;
+          }
+        } else {
+          throw switchError;
+        }
+      }
+
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer   = provider.getSigner();
       const tx = await signer.sendTransaction({
@@ -83,6 +123,7 @@ const TokenICO = ({ onClose, user }) => {
       await creditTokens(tx.hash);
     } catch (err) {
       if (err.code === 4001) toast.error("Transaction rejected.");
+      else if (err.code === -32002) toast.error("Please check MetaMask — connection request pending");
       else toast.error(err.message?.slice(0, 80) || "Transaction failed");
       setLoading(false);
     }
@@ -92,7 +133,10 @@ const TokenICO = ({ onClose, user }) => {
   const creditTokens = async (hash) => {
     const h = hash || manualTxHash;
     if (!h?.trim()) { toast.error("Please paste your transaction hash."); return; }
-    if (!user?.id)  { toast.error("Please sign in first."); return; }
+    if (!user?.id)  { 
+      toast.error("Could not find your profile. Please sign in and try again."); 
+      return; 
+    }
 
     setLoading(true);
     try {
@@ -112,6 +156,8 @@ const TokenICO = ({ onClose, user }) => {
       if (!res.ok) {
         if (data.error?.includes("pending")) {
           toast("Still confirming — wait a moment and retry.", { icon: "⏳" });
+        } else if (data.error?.includes("profile")) {
+          toast.error("Profile not found. Please sign out and sign in again.");
         } else {
           toast.error(data.error || "Verification failed");
         }
@@ -123,7 +169,8 @@ const TokenICO = ({ onClose, user }) => {
       setTxHash(h.trim());
       setStep("done");
       toast.success(`🎵 ${data.tokensAdded.toLocaleString()} MUSIC tokens credited!`);
-    } catch {
+    } catch (err) {
+      console.error("Credit error:", err);
       toast.error("Something went wrong. Try again.");
     } finally {
       setLoading(false);
